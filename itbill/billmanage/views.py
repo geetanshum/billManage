@@ -12,6 +12,7 @@ from awgp.common.data import Recordset
 from django.core import serializers
 from django.http import JsonResponse
 import json
+from django.db.models import Q
 
 def subscription(request):
     template = loader.get_template('webforntjoinform/index.html')
@@ -36,16 +37,22 @@ def reportbill(request):
     resp = Response()
     r = Recordset()
     contaxt = {}
+    var1 = '%'
     if request.method == "POST":
         fromdt = str(request.POST.get("from_date"))
         todt = str(request.POST.get("to_date"))
+        remark = str(request.POST.get("remark"))
         fromdate = datetime.strptime(fromdt, '%Y-%m-%d')
         todate = datetime.strptime(todt, '%Y-%m-%d')
-        itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
+        if str(request.POST.get("remark")) == "":
+            # print(fromdate)
+            itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
+        else:  
+            itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark).order_by("date")
         r.fromQueryset(itbill,{"code":"id","bill":"billno","date":{"name":"date","format":"%d-%m-%Y"},"remark":"remark","amount":"amount"})
         resp.success("data ok")
         resp.setExtra(r.data)
-        # print(r.data)
+        print(itbill)
         return HttpResponse(resp.getJson())
     return render(request,"webforntjoinform/report.html",context=contaxt)
 
@@ -56,12 +63,18 @@ def print_view(request):
     if request.method == "POST":
         fromdt = str(request.POST.get("from_date"))
         todt = str(request.POST.get("to_date"))
+        remark = str(request.POST.get("remark"))
         fromdate = datetime.strptime(fromdt, '%Y-%m-%d')
         todate = datetime.strptime(todt, '%Y-%m-%d')
-        itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
-        r.fromQueryset(itbill,{"date":{"name":"date","format":"%d-%m-%Y"},"amount":"amount"})
+        # print(remark)
+        if str(request.POST.get("remark")) == "":
+            # print(fromdate)
+            itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
+        else:  
+            itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark).order_by("date")
+        r.fromQueryset(itbill,{"date":{"name":"date","format":"%d-%m-%Y"},"remark":"remark","amount":"amount"})
         resp.success("data ok")
         resp.setExtra(r.data)
-        # print(r.data)
+        print(itbill)
         return HttpResponse(resp.getJson())      
     return render(request, "webforntjoinform/print.html",context=contaxt)

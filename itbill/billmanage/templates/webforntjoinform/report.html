@@ -31,6 +31,7 @@
   </div> -->
 <div>
     <div id="parmId" class="container d-print-none" style="padding: 20px;"></div>
+    <div id="submit" class="d-print-none" style="position: relative;padding-left:16px;"></div>
     <div id="print" class="d-print-none" style="position: relative;padding-left:16px;"></div>
     <div id="reportDiv" style="padding:50px 0px 0px 90px;"></div>
     
@@ -52,15 +53,19 @@
             "fields":[
             {"id":"from_date","type":"JQDate","name":"From Date:","style":{"margin":"0px 0px 10px 20px"}},
             {"id":"to_date","type":"JQDate","name":"To Date:","column":2,"style":{"margin":"0px 0px 0px 40px"}},
-            {"id":"submit","type":"Button","name":"","default":"Submit","className":"btn btn-outline-danger","style":{"margin-top":"15px","padding":"5px 20px 5px 5px"}},
+            {"id":"remark","type":"TextBox","name":"Name","style":{"margin":"0px 0px 10px 20px"}},
             ]
         })
-        form.onclick("submit",function() 
+        var button = new UIObject("button","#submit");
+        button.innerHTML("Submit");
+        button.className("btn btn-warning");
+        button.style({"margin-bottom":"20px"});
+        button.onclick(function() 
         {
-            ajaxJson("/bill/report","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value(),function(resp)
+            ajaxJson("/bill/report","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value()+"&remark="+form.remark.value(),function(resp)
             {
                 
-                console.log(resp)
+                // console.log(resp)
                 table = new UIDoc("#reportDiv");
                 table.setStructure({
                     "id":"parmtable",
@@ -79,17 +84,21 @@
                 table.value(resp.extra);
                 table.update();
             });
+            function updatediv()
+            {
+                document.getElementById("print").innerHTML = "";
+            }
+            updatediv();
                 var button = new UIObject("button","#print");
                 button.innerHTML("Total Amount");
                 button.className("btn btn-warning");
                 // button.style({"marginTop":"40px"});
                 button.onclick(function()
                 { 
-                    
-                
-                    ajaxJson("/bill/report/print","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value(),function(resp)
-                    {
 
+                    ajaxJson("/bill/report/print","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value()+"&remark="+form.remark.value(),function(resp)
+                    {
+                        console.info(resp.extra);
                         table1 = new UIDoc("#reportDiv");
                         table1.setStructure({
                             "id":"parmtable",
@@ -99,7 +108,9 @@
                             "showSummery":true,
                             "fields":[ 
                                 {"id":"DATE","name":"Date","type":"Div"},
+                                {"id":"REMARK","name":"Remark","type":"Div"},
                                 {"id":"AMOUNT","name":"Amount","type":"Div","type":"Currency","summery":"sum"},
+                                
                             ]
                         })
                         table1.value(resp.extra);
@@ -107,7 +118,6 @@
                         table1.showDownloadOption();
                         
                     });
-                    
                 })
         })
         form.update(); 
