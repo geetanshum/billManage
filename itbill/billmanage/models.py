@@ -13,6 +13,8 @@ class bill(models.Model):
     date = models.DateField()
     amount = models.IntegerField()
     remark = models.TextField()
+    choices = (('P', 'Paid'), ('U', 'Unpaid'))
+    status = models.CharField(max_length=10, choices=choices, default='U')
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     
     def __str__(self):

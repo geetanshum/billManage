@@ -32,6 +32,14 @@
 <div>
     <div id="parmId" class="container d-print-none" style="padding: 20px;"></div>
     <div id="submit" class="d-print-none" style="position: relative;padding-left:16px;"></div>
+    <!-- {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info">
+      <strong>{{message}}</strong>
+    </div>
+    {% endfor %}
+    {% endif %} -->
+
     <div id="print" class="d-print-none" style="position: relative;padding-left:16px;"></div>
     <div id="reportDiv" style="padding:50px 0px 0px 90px;"></div>
     
@@ -44,16 +52,21 @@
     $( document ).ready(function() 
     {
         var form = new UIDoc("#parmId")
+        var choices = [
+                {"code":"P","name":"Paid"},
+                {"code":"U","name":"UnPaid"},
+                ]
         form.setStructure({
             "id":"parmform",
-            "name":"Bill Report Genrate",
+            "name":"Bill Report Generate",
             "mode":"form",
             "isEditable":1,
             "isSubmitable":0,
             "fields":[
             {"id":"from_date","type":"JQDate","name":"From Date:","style":{"margin":"0px 0px 10px 20px"}},
             {"id":"to_date","type":"JQDate","name":"To Date:","column":2,"style":{"margin":"0px 0px 0px 40px"}},
-            {"id":"remark","type":"TextBox","name":"Name","style":{"margin":"0px 0px 10px 20px"}},
+            {"id":"remark","type":"TextBox","name":"Name","style":{"margin":"2px 2px 10px 20px"}},
+            {"id":"status","type":"ComboBox","options":choices,"name":"Status", "column":2, "style":{"margin":"4px 4px 10px 40px"}},
             ]
         })
         var button = new UIObject("button","#submit");
@@ -62,26 +75,40 @@
         button.style({"margin-bottom":"20px"});
         button.onclick(function() 
         {
-            ajaxJson("/bill/report","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value()+"&remark="+form.remark.value(),function(resp)
-            {
-                
-                // console.log(resp)
+            ajaxJson("/bill/report","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value()+"&remark="+form.remark.value()+"&status="+form.status.value(),function(resp)
+            { 
+                //console.log(resp)
+                var choices = [
+                {"code":"P","name":"Paid"},
+                {"code":"U","name":"UnPaid"},
+                ]
                 table = new UIDoc("#reportDiv");
                 table.setStructure({
                     "id":"parmtable",
                     "name":"Bill Report",
-                    "isSubmitable":false,
+                    "isSubmitable":true,
                     "mode":"table",
-                    "showSummery":true,
+                    "isEditable":true,
                     "fields":[
                         {"id":"CODE","name":"Sr.no","type":"Div","hidden":true},
                         {"id":"BILL","name":"Bill","type":"Div"},
                         {"id":"DATE","name":"Date","type":"Div"},
                         {"id":"REMARK","name":"Remark","type":"Div"},
                         {"id":"AMOUNT","name":"Amount","type":"Div","type":"Currency"},
+                        {"id":"STATUS","name":"Status","type":"ComboBox","options":choices},
                     ]
                 })
                 table.value(resp.extra);
+                table.onchange("STATUS",function(obj,row){
+                    //alert("msg");
+                    var id = JSON.stringify(row.rowData.CODE);
+                    
+                    console.log(id)
+                    ajaxJson("status/update","csrfmiddlewaretoken={{csrf_token}}&data="+id, function(){
+                        //console.log(resp)
+                        alert({{ message }})
+                    });
+                })
                 table.update();
             });
             function updatediv()
@@ -96,7 +123,7 @@
                 button.onclick(function()
                 { 
 
-                    ajaxJson("/bill/report/print","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value()+"&remark="+form.remark.value(),function(resp)
+                    ajaxJson("/bill/report/print","csrfmiddlewaretoken={{ csrf_token }}&from_date="+form.from_date.value()+"&to_date="+form.to_date.value()+"&remark="+form.remark.value()+"&status="+form.status.value(),function(resp)
                     {
                         console.info(resp.extra);
                         table1 = new UIDoc("#reportDiv");
@@ -110,6 +137,7 @@
                                 {"id":"DATE","name":"Date","type":"Div"},
                                 {"id":"REMARK","name":"Remark","type":"Div"},
                                 {"id":"AMOUNT","name":"Amount","type":"Div","type":"Currency","summery":"sum"},
+                                {"id":"STATUS","name":"Status","type":"Div"},
                                 
                             ]
                         })
