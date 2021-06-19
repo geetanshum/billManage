@@ -1,0 +1,124 @@
+{% load static %}
+<html>
+    <head>
+    	<meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+        <link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.min.css' %}" />
+
+        <script src="http://apidata.awgp.org/lib/js/1.0.6/devl/env-1.0.6.js"></script>
+        <script src="http://apidata.awgp.org/lib/js/1.0.6/devl/lib-1.0.6.js"></script>
+        <script src="http://apidata.awgp.org/lib/js/1.0.6/devl/ajax.1.0.6.js"></script>
+        <script src="http://apidata.awgp.org/lib/js/1.0.6/devl/uiobject-1.0.6.js"></script>
+        <script src="http://apidata.awgp.org/lib/js/1.0.6/devl/uiDoc.1.6.js"></script>
+        
+      
+    </script> 
+        </script>
+	
+    	<!-- <script src="{% static '/assets/js/jquery.min.js' %}"></script>
+        <script src="{% static '/bootstrap/js/jquery.poptrox.min.js' %}"></script>
+        <script src="{% static '/bootstrap/js/browser.min.js' %}"></script>
+        <script src="{% static '/bootstrap/js/breakpoints.min.js' %}"></script>
+        <script src="{% static '/bootstrap/js/util.js' %}"></script>
+        <script src="{% static '/bootstrap/js/bootstrap.min.js' %}"></script> -->
+        <style>
+            body{
+                position: absolute;
+                height: 100%;
+                //background-color: #EFEFEF;
+		        background-color: #fffaef;
+          
+            }
+             input,textarea,select{
+                padding:5px;
+                width:80%
+            }
+            input[type="submit"]{
+                width:unset;
+                margin-left:35%;
+            }
+            body,table{
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-size: 14px;
+            }
+            table td{
+                padding:10px;
+            }
+            table th{
+                text-align: left;
+                width:25%;
+            }
+            .ticket{
+                background-color: brown;
+            }
+            
+           .input1{
+                width:20%;
+            }
+        </style>
+    </head>
+
+    <body class="position-relative">
+        
+    <div class="container-fluid p-3 d-print-none bg-dark text-white text-center ">
+        <b style="font-size:20px">IT Expenses Manage From </b>
+                <div class=" w-20 float-right mx-3"> 
+                    {% if user.id == None %}
+                    
+                        <div class="btn btn-warning">        
+                                <a href="/admin/login/?next={{ request.path }}" class="ticket">
+                                <div style="color: black;">Login</div>
+                                </a>
+                        </div>
+                        {% else %}
+                        <div class="btn btn-warning">
+                            <a href="/admin" class="ticket" target="_blank">
+                            <div style="color: black;">Admin</div>
+                            </a>
+                        </div>
+                            &emsp;
+                        <div class="btn btn-warning">
+                            <a href="/admin/logout/?next={{ request.path }}" class="ticket">
+                            <div style="color: black;">Logout</div>
+                            </a>
+                        </div>
+                        <div class="btn btn-warning " style="margin-left: 15px;">
+                            <a href="/bill/report" class="ticket">
+                            <div style="color: black;">Report</div>
+                            </a>
+                        </div>
+                        <div class="btn btn-warning" style="margin-left: 15px;">
+                            <a href="/bill" class="ticket">
+                            <div style="color: black;">Create Bill</div>
+                            </a>
+                        </div>
+                        
+                   
+                    {% endif %}
+                </div>
+    </div>
+    <div class="my-3">
+        <div class="container bg-warning text-black text-center pt-2 rounded-lg ">
+            <b class="fa fa-font-awesome" aria-hidden="true" style="font-size:20px"></b>
+        </div>
+        <div class="container border jumbotron p-2  " >
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+   
+    <footer id="footer" class="container-fluid d-print-none position-absolute p-3  bg-dark text-white">
+    
+        <div class="container">
+            <div class="footer-copyright">
+                &copy; Copyright . All Rights Reserved
+            </div>
+            <div class="credits">
+                Designed and developed by <a href="https://bootstrapmade.com/">Yugrishi @ IT Team Shantikunj</a>
+            </div>
+           
+        </div>
+    </footer>
+</body>
+</html>
