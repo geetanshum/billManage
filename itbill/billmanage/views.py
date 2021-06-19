@@ -47,7 +47,7 @@ def reportbill(request):
         status = str(request.POST.get("status"))
         fromdate = datetime.strptime(fromdt, '%Y-%m-%d')
         todate = datetime.strptime(todt, '%Y-%m-%d')
-        print(status)
+        # print(status)
         if status == "" and remark == "":
             # print(fromdate)
             itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
@@ -57,7 +57,7 @@ def reportbill(request):
 
         elif remark != "" and status == "":
             itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark).order_by("date")
-            print("hello")
+            # print("hello")
             
         else:
             itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark, status=status).order_by("date")
@@ -65,7 +65,7 @@ def reportbill(request):
         r.fromQueryset(itbill,{"code":"id","bill":"billno","date":{"name":"date","format":"%d-%m-%Y"},"remark":"remark","amount":"amount", "status":"status"})
         resp.success("data ok")
         resp.setExtra(r.data)
-        print(itbill)
+        # print(itbill)
         return HttpResponse(resp.getJson())
     return render(request,"webforntjoinform/report.html",context=contaxt)
 
@@ -80,23 +80,40 @@ def print_view(request):
         status = str(request.POST.get("status"))
         fromdate = datetime.strptime(fromdt, '%Y-%m-%d')
         todate = datetime.strptime(todt, '%Y-%m-%d')
-        # print(remark)
-        if str(request.POST.get("remark")) == "":
+        # changed by deepak $ chauhan
+        
+        if status == "" and remark == "":
             # print(fromdate)
             itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
-        else:  
+
+        elif str(request.POST.get("remark")) == "" and status != "":
+            itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate, status=status).order_by("date")
+
+        elif remark != "" and status == "":
             itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark).order_by("date")
+            # print("hello")       
+        else:
+            itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark, status=status).order_by("date")
+
+        # end changes
+
+        # # print(remark)
+        # if str(request.POST.get("remark")) == "":
+        #     # print(fromdate)
+        #     itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate).order_by("date")
+        # else:  
+        #     itbill = bill.objects.filter(date__gte=fromdate,date__lte=todate,remark__startswith = remark).order_by("date")
         r.fromQueryset(itbill,{"date":{"name":"date","format":"%d-%m-%Y"},"remark":"remark","amount":"amount", "status":"status"})
         resp.success("data ok")
         resp.setExtra(r.data)
-        print(itbill)
+        # print(itbill)
         return HttpResponse(resp.getJson())      
     return render(request, "webforntjoinform/print.html",context=contaxt)
 
 def statusUpdate(request):
     dt = request.POST.get("data")
     id = JSON.fromString(dt)
-    print(id)
+    # print(id)
     # resp = Response()
     # r = Recordset()
     data = bill.objects.filter(id=id)
